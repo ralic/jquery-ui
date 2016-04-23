@@ -1,12 +1,13 @@
 define( [
+	"qunit",
 	"jquery",
 	"ui/widgets/sortable"
-], function( $ ) {
+], function( QUnit, $ ) {
 
-module("sortable: options");
+QUnit.module( "sortable: options" );
 
 /*
-test("{ appendTo: 'parent' }, default", function() {
+Test("{ appendTo: 'parent' }, default", function() {
 	ok(false, "missing test - untested code is broken code.");
 });
 
@@ -15,18 +16,18 @@ test("{ appendTo: Selector }", function() {
 });
 */
 
-test( "{ axis: false }, default", function() {
-	expect( 2 );
+QUnit.test( "{ axis: false }, default", function( assert ) {
+	assert.expect( 2 );
 
 	var offsetAfter,
-		element = $( "#sortable" ).sortable({
+		element = $( "#sortable" ).sortable( {
 			axis: false,
 			change: function() {
 				offsetAfter = item.offset();
-				notEqual( offsetAfter.left, offsetBefore.left, "x axis not constrained when axis: false" );
-				notEqual( offsetAfter.top, offsetBefore.top, "y axis not constrained when axis: false" );
+				assert.notEqual( offsetAfter.left, offsetBefore.left, "x axis not constrained when axis: false" );
+				assert.notEqual( offsetAfter.top, offsetBefore.top, "y axis not constrained when axis: false" );
 			}
-		}),
+		} ),
 		item = element.find( "li" ).eq( 0 ),
 		offsetBefore = item.offset();
 
@@ -34,21 +35,21 @@ test( "{ axis: false }, default", function() {
 		dx: 50,
 		dy: 25,
 		moves: 1
-	});
-});
+	} );
+} );
 
-test( "{ axis: 'x' }", function() {
-	expect( 2 );
+QUnit.test( "{ axis: 'x' }", function( assert ) {
+	assert.expect( 2 );
 
 	var offsetAfter,
-		element = $( "#sortable" ).sortable({
+		element = $( "#sortable" ).sortable( {
 			axis: "x",
 			change: function() {
 				offsetAfter = item.offset();
-				notEqual( offsetAfter.left, offsetBefore.left, "x axis not constrained when axis: x" );
-				equal( offsetAfter.top, offsetBefore.top, "y axis constrained when axis: x" );
+				assert.notEqual( offsetAfter.left, offsetBefore.left, "x axis not constrained when axis: x" );
+				assert.equal( offsetAfter.top, offsetBefore.top, "y axis constrained when axis: x" );
 			}
-		}),
+		} ),
 		item = element.find( "li" ).eq( 0 ),
 		offsetBefore = item.offset();
 
@@ -56,21 +57,21 @@ test( "{ axis: 'x' }", function() {
 		dx: 50,
 		dy: 25,
 		moves: 1
-	});
-});
+	} );
+} );
 
-test( "{ axis: 'y' }", function() {
-	expect( 2 );
+QUnit.test( "{ axis: 'y' }", function( assert ) {
+	assert.expect( 2 );
 
 	var offsetAfter,
-		element = $( "#sortable" ).sortable({
+		element = $( "#sortable" ).sortable( {
 			axis: "y",
 			change: function() {
 				offsetAfter = item.offset();
-				equal( offsetAfter.left, offsetBefore.left, "x axis constrained when axis: y" );
-				notEqual( offsetAfter.top, offsetBefore.top, "y axis not constrained when axis: y" );
+				assert.equal( offsetAfter.left, offsetBefore.left, "x axis constrained when axis: y" );
+				assert.notEqual( offsetAfter.top, offsetBefore.top, "y axis not constrained when axis: y" );
 			}
-		}),
+		} ),
 		item = element.find( "li" ).eq( 0 ),
 		offsetBefore = item.offset();
 
@@ -78,36 +79,37 @@ test( "{ axis: 'y' }", function() {
 		dx: 50,
 		dy: 25,
 		moves: 1
-	});
-});
+	} );
+} );
 
-asyncTest( "#7415: Incorrect revert animation with axis: 'y'", function() {
-  expect( 2 );
+QUnit.test( "#7415: Incorrect revert animation with axis: 'y'", function( assert ) {
+	var ready = assert.async();
+	assert.expect( 2 );
 	var expectedLeft,
-		element = $( "#sortable" ).sortable({
+		element = $( "#sortable" ).sortable( {
 			axis: "y",
 			revert: true,
-			stop: start,
 			sort: function() {
 				expectedLeft = item.css( "left" );
 			}
-		}),
+		} ),
 		item = element.find( "li" ).eq( 0 );
 
 	item.simulate( "drag", {
 		dy: 300,
 		dx: 50
-	});
+	} );
 
-	setTimeout(function() {
+	setTimeout( function() {
 		var top = parseFloat( item.css( "top" ) );
-		equal( item.css( "left" ), expectedLeft, "left not animated" );
-		ok( top > 0 && top < 300, "top is animated" );
+		assert.equal( item.css( "left" ), expectedLeft, "left not animated" );
+		assert.ok( top > 0 && top < 300, "top is animated" );
+		ready();
 	}, 100 );
-});
+} );
 
 /*
-test("{ cancel: 'input,textarea,button,select,option' }, default", function() {
+Test("{ cancel: 'input,textarea,button,select,option' }, default", function() {
 	ok(false, "missing test - untested code is broken code.");
 });
 
@@ -116,23 +118,23 @@ test("{ cancel: Selector }", function() {
 });
 */
 
-test( "#8792: issues with floated items in connected lists", function() {
-	expect( 2 );
+QUnit.test( "#8792: issues with floated items in connected lists", function( assert ) {
+	assert.expect( 2 );
 
 	var element,
 		changeCount = 0;
 
 	$( "#qunit-fixture" )
 		.html( "<ul class='c'><li>a</li><li>a</li></ul><ul class='c'><li>a</li><li>a</li></ul>" )
-		.find( "ul" ).css({ "float": "left", width: "100px" }).end()
-		.find( "li" ).css({ "float": "left", width: "50px", height: "50px" });
+		.find( "ul" ).css( { "float": "left", width: "100px" } ).end()
+		.find( "li" ).css( { "float": "left", width: "50px", height: "50px" } );
 
-	$( "#qunit-fixture .c" ).sortable({
+	$( "#qunit-fixture .c" ).sortable( {
 		connectWith: "#qunit-fixture .c",
 		change: function() {
 			changeCount++;
 		}
-	});
+	} );
 
 	element = $( "#qunit-fixture li:eq(0)" );
 
@@ -140,49 +142,49 @@ test( "#8792: issues with floated items in connected lists", function() {
 	element.simulate( "drag", {
 		dx: 55,
 		moves: 15
-	});
+	} );
 
-	equal( changeCount, 1, "change fired only once (no jitters) when dragging a floated sortable in it's own container" );
+	assert.equal( changeCount, 1, "change fired only once (no jitters) when dragging a floated sortable in it's own container" );
 
 	// Move the first li ( which is now in the second spot )
 	// through the first spot in the second ul to the second spot in the second ul
 	element.simulate( "drag", {
 		dx: 100,
 		moves: 15
-	});
+	} );
 
-	equal( changeCount, 3, "change fired once for each expected change when dragging a floated sortable to a connected container" );
-});
+	assert.equal( changeCount, 3, "change fired once for each expected change when dragging a floated sortable to a connected container" );
+} );
 
-test( "#8301: single axis with connected list", function() {
-	expect( 1 );
+QUnit.test( "#8301: single axis with connected list", function( assert ) {
+	assert.expect( 1 );
 
-	var element = $( "#sortable" ).sortable({
+	var element = $( "#sortable" ).sortable( {
 		axis: "y",
 		tolerance: "pointer",
 		connectWith: ".connected"
-	});
+	} );
 
 	$( "<ul class='connected'><li>Item 7</li><li>Item 8</li></ul>" )
-		.sortable({
+		.sortable( {
 			axis: "y",
 			tolerance: "pointer",
 			connectWith: "#sortable",
 			receive: function() {
-				ok( true, "connected list received item" );
+				assert.ok( true, "connected list received item" );
 			}
-		})
+		} )
 		.insertAfter( element );
 
 	element.find( "li" ).eq( 0 ).simulate( "drag", {
 		handle: "corner",
 		dy: 120,
 		moves: 1
-	});
-});
+	} );
+} );
 
 /*
-test("{ connectWith: false }, default", function() {
+Test("{ connectWith: false }, default", function() {
 	ok(false, "missing test - untested code is broken code.");
 });
 
@@ -327,105 +329,105 @@ test("{ placeholder: false }, default", function() {
 });
 */
 
-test( "{ placeholder: false } img", function() {
-	expect( 3 );
+QUnit.test( "{ placeholder: false } img", function( assert ) {
+	assert.expect( 3 );
 
-	var element = $( "#sortable-images" ).sortable({
+	var element = $( "#sortable-images" ).sortable( {
 		start: function( event, ui ) {
-			ok( ui.placeholder.attr( "src" ).indexOf( "images/jqueryui_32x32.png" ) > 0, "placeholder img has correct src" );
-			equal( ui.placeholder.height(), 32, "placeholder has correct height" );
-			equal( ui.placeholder.width(), 32, "placeholder has correct width" );
+			assert.ok( ui.placeholder.attr( "src" ).indexOf( "images/jqueryui_32x32.png" ) > 0, "placeholder img has correct src" );
+			assert.equal( ui.placeholder.height(), 32, "placeholder has correct height" );
+			assert.equal( ui.placeholder.width(), 32, "placeholder has correct width" );
 		}
-	});
+	} );
 
 	element.find( "img" ).eq( 0 ).simulate( "drag", {
 		dy: 1
-	});
-});
+	} );
+} );
 
-test( "{ placeholder: String }", function( assert ) {
-	expect( 1 );
+QUnit.test( "{ placeholder: String }", function( assert ) {
+	assert.expect( 1 );
 
-	var element = $( "#sortable" ).sortable({
+	var element = $( "#sortable" ).sortable( {
 		placeholder: "test",
 		start: function( event, ui ) {
 			assert.hasClasses( ui.placeholder, "test" );
 		}
-	});
+	} );
 
 	element.find( "li" ).eq( 0 ).simulate( "drag", {
 		dy: 1
-	});
-});
+	} );
+} );
 
-test( "{ placholder: String } tr", function( assert ) {
-	expect( 4 );
+QUnit.test( "{ placholder: String } tr", function( assert ) {
+	assert.expect( 4 );
 
 	var originalWidths,
-		element = $( "#sortable-table tbody" ).sortable({
+		element = $( "#sortable-table tbody" ).sortable( {
 			placeholder: "test",
 			start: function( event, ui ) {
-				var currentWidths = otherRow.children().map(function() {
+				var currentWidths = otherRow.children().map( function() {
 					return $( this ).width();
-				}).get();
+				} ).get();
 				assert.hasClasses( ui.placeholder, "test" );
-				deepEqual( currentWidths, originalWidths, "table cells maintian size" );
-				equal( ui.placeholder.children().length, dragRow.children().length,
+				assert.deepEqual( currentWidths, originalWidths, "table cells maintian size" );
+				assert.equal( ui.placeholder.children().length, dragRow.children().length,
 					"placeholder has correct number of cells" );
-				equal( ui.placeholder.children().html(), $( "<span>&#160;</span>" ).html(),
+				assert.equal( ui.placeholder.children().html(), $( "<span>&#160;</span>" ).html(),
 					"placeholder td has content for forced dimensions" );
 			}
-		}),
+		} ),
 		rows = element.children( "tr" ),
 		dragRow = rows.eq( 0 ),
 		otherRow = rows.eq( 1 );
 
-	originalWidths = otherRow.children().map(function() {
+	originalWidths = otherRow.children().map( function() {
 		return $( this ).width();
-	}).get();
+	} ).get();
 	dragRow.simulate( "drag", {
 		dy: 1
-	});
-});
+	} );
+} );
 
-test( "{ placholder: String } tbody", function() {
-	expect( 6 );
+QUnit.test( "{ placholder: String } tbody", function( assert ) {
+	assert.expect( 6 );
 
 	var originalWidths,
-		element = $( "#sortable-table" ).sortable({
+		element = $( "#sortable-table" ).sortable( {
 			placeholder: "test",
 			start: function( event, ui ) {
-				var currentWidths = otherBody.children().map(function() {
+				var currentWidths = otherBody.children().map( function() {
 					return $( this ).width();
-				}).get();
-				ok( ui.placeholder.hasClass( "test" ), "placeholder has class" );
-				deepEqual( currentWidths, originalWidths, "table cells maintain size" );
-				equal( ui.placeholder.children().length, 1,
+				} ).get();
+				assert.ok( ui.placeholder.hasClass( "test" ), "placeholder has class" );
+				assert.deepEqual( currentWidths, originalWidths, "table cells maintain size" );
+				assert.equal( ui.placeholder.children().length, 1,
 					"placeholder has one child" );
-				equal( ui.placeholder.children( "tr" ).length, 1,
+				assert.equal( ui.placeholder.children( "tr" ).length, 1,
 					"placeholder's child is tr" );
-				equal( ui.placeholder.find( "> tr" ).children().length,
+				assert.equal( ui.placeholder.find( "> tr" ).children().length,
 					dragBody.find( "> tr:first" ).children().length,
 					"placeholder's tr has correct number of cells" );
-				equal( ui.placeholder.find( "> tr" ).children().html(),
+				assert.equal( ui.placeholder.find( "> tr" ).children().html(),
 					$( "<span>&#160;</span>" ).html(),
 					"placeholder td has content for forced dimensions" );
 			}
-		}),
+		} ),
 		bodies = element.children( "tbody" ),
 		dragBody = bodies.eq( 0 ),
 		otherBody = bodies.eq( 1 );
 
-	originalWidths = otherBody.children().map(function() {
+	originalWidths = otherBody.children().map( function() {
 		return $( this ).width();
-	}).get();
+	} ).get();
 	dragBody.simulate( "drag", {
 		dy: 1
-	});
-});
+	} );
+} );
 
 /*
-test("{ revert: false }, default", function() {
+Test("{ revert: false }, default", function() {
 	ok(false, "missing test - untested code is broken code.");
 });
 

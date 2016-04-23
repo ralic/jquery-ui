@@ -1,12 +1,13 @@
 define( [
+	"qunit",
 	"jquery",
 	"ui/widgets/droppable"
-], function( $ ) {
+], function( QUnit, $ ) {
 
-module( "droppable: options" );
+QUnit.module( "droppable: options" );
 
 /*
-test( "{ accept '*' }, default ", function() {
+Test( "{ accept '*' }, default ", function() {
 	ok(false, 'missing test - untested code is broken code');
 });
 
@@ -22,25 +23,25 @@ test( "activeClass", function() {
 	ok(false, 'missing test - untested code is broken code');
 });
 */
-test( "{ addClasses: true }, default", function( assert ) {
-	expect( 1 );
-	var el = $( "<div />" ).droppable({ addClasses: true });
+QUnit.test( "{ addClasses: true }, default", function( assert ) {
+	assert.expect( 1 );
+	var el = $( "<div />" ).droppable( { addClasses: true } );
 	assert.hasClasses( el, "ui-droppable" );
 	el.droppable( "destroy" );
-});
+} );
 
-test( "{ addClasses: false }", function( assert ) {
-	expect( 1 );
-	var el = $( "<div />" ).droppable({ addClasses: false });
+QUnit.test( "{ addClasses: false }", function( assert ) {
+	assert.expect( 1 );
+	var el = $( "<div />" ).droppable( { addClasses: false } );
 
 	assert.lacksClasses( el, "ui-droppable" );
 	el.droppable( "destroy" );
-});
+} );
 
-test( "scope", function() {
-	expect( 4 );
+QUnit.test( "scope", function( assert ) {
+	assert.expect( 4 );
 	var droppableOffset, draggableOffset, oldDraggableOffset, dx, dy,
-		draggable1 = $( "<div />" ).appendTo( "#qunit-fixture" ).draggable({ revert: "invalid" }),
+		draggable1 = $( "<div />" ).appendTo( "#qunit-fixture" ).draggable( { revert: "invalid" } ),
 		draggable2 = $( "<div />" ).appendTo( "#qunit-fixture" ).droppable(),
 		droppable = $( "<div />" ).appendTo( "#qunit-fixture" ).droppable(),
 		newScope = "test";
@@ -57,11 +58,11 @@ test( "scope", function() {
 	draggable1.simulate( "drag", {
 		dx: dx,
 		dy: dy
-	});
+	} );
 
 	draggableOffset = draggable1.offset();
-	equal( draggableOffset.left, droppableOffset.left );
-	equal( draggableOffset.top, droppableOffset.top );
+	assert.equal( draggableOffset.left, droppableOffset.left );
+	assert.equal( draggableOffset.top, droppableOffset.top );
 
 	// Test that droppable doesn't accept draggable with old scope.
 	draggableOffset = draggable2.offset();
@@ -72,14 +73,14 @@ test( "scope", function() {
 	draggable2.simulate( "drag", {
 		dx: dx,
 		dy: dy
-	});
+	} );
 
 	draggableOffset = draggable2.offset();
-	equal( draggableOffset.left, oldDraggableOffset.left );
-	equal( draggableOffset.top, oldDraggableOffset.top );
-});
+	assert.equal( draggableOffset.left, oldDraggableOffset.left );
+	assert.equal( draggableOffset.top, oldDraggableOffset.top );
+} );
 /*
-test( "greedy", function() {
+Test( "greedy", function() {
 	ok(false, 'missing test - untested code is broken code');
 });
 
@@ -92,8 +93,8 @@ test( "tolerance, fit", function() {
 });
 */
 
-test( "tolerance, intersect", function() {
-	expect( 2 );
+QUnit.test( "tolerance, intersect", function( assert ) {
+	assert.expect( 2 );
 
 	var draggable, droppable,
 		dataset = [
@@ -109,7 +110,7 @@ test( "tolerance, intersect", function() {
 
 	draggable = $( "<div />" )
 		.appendTo( "#qunit-fixture" )
-		.css({
+		.css( {
 			width: 10,
 			height: 10,
 			position: "absolute",
@@ -118,35 +119,35 @@ test( "tolerance, intersect", function() {
 			// Droppable: droppable region is offset by draggables margin
 			marginTop: 3,
 			marginLeft: 3
-		})
+		} )
 		.draggable();
 
 	droppable = $( "<div />" )
 		.appendTo( "#qunit-fixture" )
-		.css({ width: 10, height: 10, position: "absolute", top: 13, left: 13 })
-		.droppable({ tolerance: "intersect" });
+		.css( { width: 10, height: 10, position: "absolute", top: 13, left: 13 } )
+		.droppable( { tolerance: "intersect" } );
 
 	$.each( dataset, function() {
 		var data = this;
 
-		draggable.css({
+		draggable.css( {
 			top: 0,
 			left: 0
-		});
+		} );
 
 		droppable.off( "drop" ).on( "drop", function() {
-			equal( true, data[ 2 ], data[ 3 ] );
-		});
+			assert.equal( true, data[ 2 ], data[ 3 ] );
+		} );
 
 		$( draggable ).simulate( "drag", {
 			dx: data[ 0 ],
 			dy: data[ 1 ]
-		});
-	});
-});
+		} );
+	} );
+} );
 
-test( "tolerance, pointer", function() {
-	expect( 3 );
+QUnit.test( "tolerance, pointer", function( assert ) {
+	assert.expect( 3 );
 
 	var draggable, droppable,
 		dataset = [
@@ -162,43 +163,43 @@ test( "tolerance, pointer", function() {
 
 	draggable = $( "<div />" )
 		.appendTo( "#qunit-fixture" )
-		.css({ width: 10, height: 10, position: "absolute" })
+		.css( { width: 10, height: 10, position: "absolute" } )
 		.draggable();
 
 	droppable = $( "<div />" )
 		.appendTo( "#qunit-fixture" )
-		.css({ width: 10, height: 10, position: "absolute", top: 5, left: 5 })
-		.droppable({ tolerance: "pointer" });
+		.css( { width: 10, height: 10, position: "absolute", top: 5, left: 5 } )
+		.droppable( { tolerance: "pointer" } );
 
 	$.each( dataset, function() {
 		var data = this;
 
 		droppable.off( "drop" ).on( "drop", function() {
-			equal( true, data[ 2 ], data[ 3 ] );
-		});
+			assert.equal( true, data[ 2 ], data[ 3 ] );
+		} );
 
 		$( draggable ).simulate( "drag", {
 			dx: ( data[ 0 ] - $( draggable ).position().left ),
 			dy: ( data[ 1 ] - $( draggable ).position().top )
-		});
-	});
+		} );
+	} );
 
 	// Http://bugs.jqueryui.com/ticket/4977 - tolerance, pointer - bug when pointer outside draggable
-	draggable.css({ top: 0, left: 0 }).draggable( "option", "axis", "x" );
-	droppable.css({ top: 15, left: 15 });
+	draggable.css( { top: 0, left: 0 } ).draggable( "option", "axis", "x" );
+	droppable.css( { top: 15, left: 15 } );
 
 	droppable.off( "drop" ).on( "drop", function() {
-		ok( true, "drop fires as long as pointer is within droppable" );
-	});
+		assert.ok( true, "drop fires as long as pointer is within droppable" );
+	} );
 
 	$( draggable ).simulate( "drag", {
 		dx: 10,
 		dy: 10
-	});
-});
+	} );
+} );
 
 /*
-test( "tolerance, touch", function() {
+Test( "tolerance, touch", function() {
 	ok(false, 'missing test - untested code is broken code');
 });
 */

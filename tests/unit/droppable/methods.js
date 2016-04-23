@@ -1,92 +1,93 @@
 define( [
+	"qunit",
 	"jquery",
 	"./helper",
 	"ui/widgets/droppable"
-], function( $, testHelper ) {
+], function( QUnit, $, testHelper ) {
 
-module("droppable: methods");
+QUnit.module( "droppable: methods" );
 
-test("init", function() {
-	expect( 5 );
+QUnit.test( "init", function( assert ) {
+	assert.expect( 5 );
 
-	$("<div></div>").appendTo("body").droppable().remove();
-	ok(true, ".droppable() called on element");
+	$( "<div></div>" ).appendTo( "body" ).droppable().remove();
+	assert.ok( true, ".droppable() called on element" );
 
-	$([]).droppable();
-	ok(true, ".droppable() called on empty collection");
+	$( [] ).droppable();
+	assert.ok( true, ".droppable() called on empty collection" );
 
-	$("<div></div>").droppable();
-	ok(true, ".droppable() called on disconnected DOMElement");
+	$( "<div></div>" ).droppable();
+	assert.ok( true, ".droppable() called on disconnected DOMElement" );
 
-	$("<div></div>").droppable().droppable("option", "foo");
-	ok(true, "arbitrary option getter after init");
+	$( "<div></div>" ).droppable().droppable( "option", "foo" );
+	assert.ok( true, "arbitrary option getter after init" );
 
-	$("<div></div>").droppable().droppable("option", "foo", "bar");
-	ok(true, "arbitrary option setter after init");
-});
+	$( "<div></div>" ).droppable().droppable( "option", "foo", "bar" );
+	assert.ok( true, "arbitrary option setter after init" );
+} );
 
-test("destroy", function() {
-	expect( 4 );
+QUnit.test( "destroy", function( assert ) {
+	assert.expect( 4 );
 
-	$("<div></div>").appendTo("body").droppable().droppable("destroy").remove();
-	ok(true, ".droppable('destroy') called on element");
+	$( "<div></div>" ).appendTo( "body" ).droppable().droppable( "destroy" ).remove();
+	assert.ok( true, ".droppable('destroy') called on element" );
 
-	$([]).droppable().droppable("destroy");
-	ok(true, ".droppable('destroy') called on empty collection");
+	$( [] ).droppable().droppable( "destroy" );
+	assert.ok( true, ".droppable('destroy') called on empty collection" );
 
-	$("<div></div>").droppable().droppable("destroy");
-	ok(true, ".droppable('destroy') called on disconnected DOMElement");
+	$( "<div></div>" ).droppable().droppable( "destroy" );
+	assert.ok( true, ".droppable('destroy') called on disconnected DOMElement" );
 
-	var expected = $("<div></div>").droppable(),
-		actual = expected.droppable("destroy");
-	equal(actual, expected, "destroy is chainable");
-});
+	var expected = $( "<div></div>" ).droppable(),
+		actual = expected.droppable( "destroy" );
+	assert.equal( actual, expected, "destroy is chainable" );
+} );
 
-test("enable", function() {
-	expect(7);
+QUnit.test( "enable", function( assert ) {
+	assert.expect( 7 );
 
 	var el, expected, actual;
 
-	el = $("#droppable1").droppable({ disabled: true });
-	testHelper.shouldNotDrop();
-	el.droppable("enable");
-	testHelper.shouldDrop();
-	equal(el.droppable("option", "disabled"), false, "disabled option getter");
-	el.droppable("destroy");
-	el.droppable({ disabled: true });
-	testHelper.shouldNotDrop();
-	el.droppable("option", "disabled", false);
-	equal(el.droppable("option", "disabled"), false, "disabled option setter");
-	testHelper.shouldDrop();
+	el = $( "#droppable1" ).droppable( { disabled: true } );
+	testHelper.shouldNotDrop( assert );
+	el.droppable( "enable" );
+	testHelper.shouldDrop( assert );
+	assert.equal( el.droppable( "option", "disabled" ), false, "disabled option getter" );
+	el.droppable( "destroy" );
+	el.droppable( { disabled: true } );
+	testHelper.shouldNotDrop( assert );
+	el.droppable( "option", "disabled", false );
+	assert.equal( el.droppable( "option", "disabled" ), false, "disabled option setter" );
+	testHelper.shouldDrop( assert );
 
-	expected = $("<div></div>").droppable(),
-	actual = expected.droppable("enable");
-	equal(actual, expected, "enable is chainable");
-});
+	expected = $( "<div></div>" ).droppable(),
+	actual = expected.droppable( "enable" );
+	assert.equal( actual, expected, "enable is chainable" );
+} );
 
-test( "disable", function( assert ) {
-	expect( 10 );
+QUnit.test( "disable", function( assert ) {
+	assert.expect( 10 );
 
 	var actual, expected,
-		element = $( "#droppable1" ).droppable({ disabled: false });
+		element = $( "#droppable1" ).droppable( { disabled: false } );
 
-	testHelper.shouldDrop();
+	testHelper.shouldDrop( assert );
 	element.droppable( "disable" );
-	testHelper.shouldNotDrop();
-	equal( element.droppable( "option", "disabled" ), true, "disabled option getter" );
+	testHelper.shouldNotDrop( assert );
+	assert.equal( element.droppable( "option", "disabled" ), true, "disabled option getter" );
 	element.droppable( "destroy" );
-	element.droppable({ disabled: false });
-	testHelper.shouldDrop();
+	element.droppable( { disabled: false } );
+	testHelper.shouldDrop( assert );
 	element.droppable( "option", "disabled", true );
 	assert.lacksClasses( element.droppable( "widget" ), "ui-state-disabled" );
-	ok( !element.droppable( "widget" ).attr( "aria-disabled" ), "element does not get aria-disabled" );
+	assert.ok( !element.droppable( "widget" ).attr( "aria-disabled" ), "element does not get aria-disabled" );
 	assert.hasClasses( element.droppable( "widget" ), "ui-droppable-disabled" );
-	equal( element.droppable( "option", "disabled" ), true, "disabled option setter" );
-	testHelper.shouldNotDrop();
+	assert.equal( element.droppable( "option", "disabled" ), true, "disabled option setter" );
+	testHelper.shouldNotDrop( assert );
 
 	expected = $( "<div></div>" ).droppable();
 	actual = expected.droppable( "disable" );
-	equal( actual, expected, "disable is chainable" );
-});
+	assert.equal( actual, expected, "disable is chainable" );
+} );
 
 } );

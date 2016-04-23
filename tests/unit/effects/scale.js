@@ -1,18 +1,20 @@
 define( [
+	"qunit",
 	"jquery",
 	"ui/effects/effect-scale"
-], function( $ ) {
+], function( QUnit, $ ) {
 
-module( "effect.scale: Scale" );
+QUnit.module( "effect.scale: Scale" );
 
 function run( position, v, h, vo, ho ) {
 	var desc = "End Position Correct: " + position + " (" + v + "," + h + ") - origin: (" + vo + "," + ho + ")";
-	asyncTest( desc, function( assert ) {
-		expect( 2 );
+	QUnit.test( desc, function( assert ) {
+		var ready = assert.async();
+		assert.expect( 2 );
 		function complete() {
 			assert.close( parseInt( test.css( h ), 10 ), target[ h ], 1, "Horizontal Position Correct " + desc );
 			assert.close( parseInt( test.css( v ), 10 ), target[ v ], 1, "Vertical Position Correct " + desc );
-			start();
+			ready();
 		}
 		var test = $( ".testScale" ),
 			css = {
@@ -41,7 +43,7 @@ function run( position, v, h, vo, ho ) {
 		}
 		test.css( css );
 		test.effect( effect );
-	});
+	} );
 }
 
 function suite( position ) {
@@ -55,18 +57,18 @@ function suite( position ) {
 	*/
 }
 
-$(function() {
+$( function() {
 	suite( "absolute" );
 	suite( "relative" );
 	var fixedElem = $( "<div>" )
-		.css({
+		.css( {
 			position: "fixed",
 			top: 10
-		})
+		} )
 		.appendTo( "body" );
 	if ( fixedElem.offset().top === 10 ) {
 		suite( "fixed" );
 	}
-});
+} );
 
 } );

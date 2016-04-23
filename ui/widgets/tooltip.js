@@ -12,9 +12,9 @@
 //>>description: Shows additional information for any element on hover or focus.
 //>>docs: http://api.jqueryui.com/tooltip/
 //>>demos: http://jqueryui.com/tooltip/
-//>>css.structure: ../themes/base/core.css
-//>>css.structure: ../themes/base/tooltip.css
-//>>css.theme: ../themes/base/theme.css
+//>>css.structure: ../../themes/base/core.css
+//>>css.structure: ../../themes/base/tooltip.css
+//>>css.theme: ../../themes/base/theme.css
 
 ( function( factory ) {
 	if ( typeof define === "function" && define.amd ) {
@@ -42,13 +42,16 @@ $.widget( "ui.tooltip", {
 			"ui-tooltip": "ui-corner-all ui-widget-shadow"
 		},
 		content: function() {
+
 			// support: IE<9, Opera in jQuery <1.7
 			// .text() can't accept undefined, so coerce to a string
 			var title = $( this ).attr( "title" ) || "";
+
 			// Escape title, since we're going from an attribute to raw HTML
 			return $( "<a>" ).text( title ).html();
 		},
 		hide: true,
+
 		// Disabled elements have inconsistent behavior across browsers (#8661)
 		items: "[title]:not([disabled])",
 		position: {
@@ -102,10 +105,6 @@ $.widget( "ui.tooltip", {
 		// IDs of parent tooltips where we removed the title attribute
 		this.parents = {};
 
-		if ( this.options.disabled ) {
-			this._disable();
-		}
-
 		// Append the aria-live region so tooltips announce correctly
 		this.liveRegion = $( "<div>" )
 			.attr( {
@@ -115,17 +114,12 @@ $.widget( "ui.tooltip", {
 			} )
 			.appendTo( this.document[ 0 ].body );
 		this._addClass( this.liveRegion, null, "ui-helper-hidden-accessible" );
+
+		this.disabledTitles = $( [] );
 	},
 
 	_setOption: function( key, value ) {
 		var that = this;
-
-		if ( key === "disabled" ) {
-			this[ value ? "_disable" : "_enable" ]();
-			this.options[ key ] = value;
-			// disable element style changes
-			return;
-		}
 
 		this._super( key, value );
 
@@ -134,6 +128,10 @@ $.widget( "ui.tooltip", {
 				that._updateContent( tooltipData.element );
 			} );
 		}
+	},
+
+	_setOptionDisabled: function( value ) {
+		this[ value ? "_disable" : "_enable" ]();
 	},
 
 	_disable: function() {
@@ -147,29 +145,35 @@ $.widget( "ui.tooltip", {
 		} );
 
 		// Remove title attributes to prevent native tooltips
-		this.element.find( this.options.items ).addBack().each( function() {
-			var element = $( this );
-			if ( element.is( "[title]" ) ) {
-				element
-					.data( "ui-tooltip-title", element.attr( "title" ) )
-					.removeAttr( "title" );
-			}
-		} );
+		this.disabledTitles = this.disabledTitles.add(
+			this.element.find( this.options.items ).addBack()
+				.filter( function() {
+					var element = $( this );
+					if ( element.is( "[title]" ) ) {
+						return element
+							.data( "ui-tooltip-title", element.attr( "title" ) )
+							.removeAttr( "title" );
+					}
+				} )
+		);
 	},
 
 	_enable: function() {
+
 		// restore title attributes
-		this.element.find( this.options.items ).addBack().each( function() {
+		this.disabledTitles.each( function() {
 			var element = $( this );
 			if ( element.data( "ui-tooltip-title" ) ) {
 				element.attr( "title", element.data( "ui-tooltip-title" ) );
 			}
 		} );
+		this.disabledTitles = $( [] );
 	},
 
 	open: function( event ) {
 		var that = this,
 			target = $( event ? event.target : this.element )
+
 				// we need closest here due to mouseover bubbling,
 				// but always pointing at the same event target
 				.closest( this.options.items );
@@ -304,6 +308,7 @@ $.widget( "ui.tooltip", {
 			this._on( this.document, {
 				mousemove: position
 			} );
+
 			// trigger once to override element-relative positioning
 			position( event );
 		} else {
@@ -315,10 +320,12 @@ $.widget( "ui.tooltip", {
 		tooltip.hide();
 
 		this._show( tooltip, this.options.show );
+
 		// Handle tracking tooltips that are shown with a delay (#8644). As soon
 		// as the tooltip is visible, position the tooltip using the most recent
 		// event.
-		if ( this.options.show && this.options.show.delay ) {
+		// Adds the check to add the timers only when both delay and track options are set (#14682)
+		if ( this.options.track && this.options.show && this.options.show.delay ) {
 			delayedShow = this.delayedShow = setInterval( function() {
 				if ( tooltip.is( ":visible" ) ) {
 					position( positionOption.of );
@@ -464,6 +471,7 @@ $.widget( "ui.tooltip", {
 
 		// Close open tooltips
 		$.each( this.tooltips, function( id, tooltipData ) {
+
 			// Delegate to close method to handle common cleanup
 			var event = $.Event( "blur" ),
 				element = tooltipData.element;
@@ -476,6 +484,7 @@ $.widget( "ui.tooltip", {
 
 			// Restore the title
 			if ( element.data( "ui-tooltip-title" ) ) {
+
 				// If the title attribute has changed since open(), don't restore
 				if ( !element.attr( "title" ) ) {
 					element.attr( "title", element.data( "ui-tooltip-title" ) );

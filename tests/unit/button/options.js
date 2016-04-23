@@ -1,157 +1,185 @@
 define( [
+	"qunit",
 	"jquery",
 	"ui/widgets/button"
-], function( $ ) {
+], function( QUnit, $ ) {
 
-module( "button: options" );
+QUnit.module( "button: options" );
 
-test( "disabled, explicit value", function( assert ) {
-	expect( 7 );
+QUnit.test( "disabled, explicit value", function( assert ) {
+	assert.expect( 8 );
 
-	var element = $( "#radio01" ).button( { disabled: false } );
-	deepEqual( element.button( "option", "disabled" ), false, "disabled option set to false" );
-	deepEqual( element.prop( "disabled" ), false, "element is disabled" );
+	var element = $( "#button" ).button( { disabled: false } );
+
+	assert.strictEqual( element.button( "option", "disabled" ), false, "disabled option set to false" );
+	assert.strictEqual( element.prop( "disabled" ), false, "Disabled property is false" );
 
 	assert.lacksClasses( element.button( "widget" ), "ui-state-disabled ui-button-disabled" );
 
-	element = $( "#radio02" ).button( { disabled: true } );
+	element = $( "#button" ).button( { disabled: true } );
 
-	ok( !element.button( "widget" ).attr( "aria-disabled" ), "element does not get aria-disabled" );
-	assert.hasClasses( element.button( "widget" ), "ui-button-disabled ui-state-disabled" );
+	assert.hasClasses( element.button( "widget" ), "ui-state-disabled" );
+	assert.strictEqual( element.button( "widget" ).attr( "aria-disabled" ), undefined,
+		"element does not get aria-disabled" );
+	assert.hasClasses( element.button( "widget" ), "ui-button-disabled" );
 
-	deepEqual( element.button( "option", "disabled" ), true, "disabled option set to true" );
-	deepEqual( element.prop( "disabled" ), true, "element is not disabled" );
+	assert.strictEqual( element.button( "option", "disabled" ), true, "disabled option set to true" );
+	assert.strictEqual( element.prop( "disabled" ), true, "Disabled property is set" );
 } );
 
-test( "disabled, null", function() {
-	expect( 4 );
-	$( "#radio01" ).button( { disabled: null } );
-	deepEqual( false, $( "#radio01" ).button( "option", "disabled" ),
-		"disabled option set to false" );
-	deepEqual( false, $( "#radio01" ).prop( "disabled" ), "element is disabled" );
+// We are testing the default here because the default null is a special value which means to check
+// the DOM. We need to make sure this happens correctly. Checking the options should never return
+// null, it should always be true or false.
+QUnit.test( "disabled, null", function( assert ) {
+	assert.expect( 4 );
+	var element = $( "#button" ),
+		elementDisabled = $( "#button-disabled" );
 
-	$( "#radio02" ).prop( "disabled", true ).button( { disabled: null } );
-	deepEqual( true, $( "#radio02" ).button( "option", "disabled" ),
+	element.add( elementDisabled ).button( { disabled: null } );
+	assert.strictEqual( element.button( "option", "disabled" ), false, "disabled option set to false" );
+	assert.strictEqual( element.prop( "disabled" ), false, "element is disabled" );
+	assert.strictEqual( elementDisabled.button( "option", "disabled" ), true,
 		"disabled option set to true" );
-	deepEqual( true, $( "#radio02" ).prop( "disabled" ), "element is not disabled" );
+	assert.strictEqual( elementDisabled.prop( "disabled" ), true, "element is disabled" );
 } );
 
-test( "disabled, ui-state-active is removed unless checkbox or radio", function( assert ) {
-	expect( 12 );
-	var elements = [
-		$( "<input type='button'>" ),
-		$( "<button></button>" ),
-		$( "<a></a>" ),
-		$( "<div></div>" ),
-		$( "<input type='checkbox' id='checkbox' checked><label for='checkbox'></label>" ),
-		$( "<input type='radio' id='radio' checked><label for='radio'></label>" )
-	];
+QUnit.test( "showLabel, false, without icon", function( assert ) {
+	assert.expect( 4 );
 
-	$.each( elements, function() {
-		var element = $( this ).first().button(),
-			buttonElement = element.button( "widget" ),
-			elementType = element.prop( "nodeName" ).toLowerCase();
-
-		if ( element.is( "input" ) ) {
-			elementType += ":" + element.attr( "type" );
-		}
-
-		element.trigger( "mousedown" );
-		assert.hasClasses( buttonElement, "ui-state-active",
-			"[" + elementType + "] has ui-state-active class after mousedown." );
-
-		element.button( "disable" );
-		if ( element.is( "[type=checkbox], [type=radio]" ) ) {
-		assert.hasClasses( buttonElement, "ui-state-active",
-				"Disabled [" + elementType + "] has ui-state-active class." );
-		} else {
-			assert.lacksClasses( buttonElement, "ui-state-active",
-				"Disabled [" + elementType + "] does not have ui-state-active class." );
-		}
+	var button = $( "#button" ).button( {
+		showLabel: false
 	} );
+
+	assert.lacksClasses( button, "ui-button-icon-only" );
+	assert.strictEqual( button.button( "option", "showLabel" ), true,
+		"showLabel false only allowed if icon true" );
+
+	button.button( "option", "showLabel", false );
+	assert.lacksClasses( button, "ui-button-icon-only" );
+	assert.strictEqual( button.button( "option", "showLabel" ), true,
+		"showLabel false only allowed if icon true" );
 } );
 
-test( "text false without icon", function() {
-	expect( 1 );
-	$( "#button" ).button( {
-		text: false
+QUnit.test( "showLabel, false, with icon", function( assert ) {
+	assert.expect( 1 );
+	var button = $( "#button" ).button( {
+		showLabel: false,
+		icon: "iconclass"
 	} );
-	ok( $( "#button" ).is( ".ui-button-text-only:not(.ui-button-icon-only)" ) );
-
-	$( "#button" ).button( "destroy" );
+	assert.hasClasses( button, "ui-button ui-corner-all ui-widget ui-button-icon-only" );
 } );
 
-test( "text false with icon", function() {
-	expect( 1 );
-	$( "#button" ).button( {
-		text: false,
-		icons: {
-			primary: "iconclass"
-		}
-	} );
-	ok( $( "#button" ).is( ".ui-button-icon-only:not(.ui-button-text):has(span.ui-icon.iconclass)" ) );
+QUnit.test( "label, default", function( assert ) {
+	assert.expect( 2 );
+	var button = $( "#button" ).button();
 
-	$( "#button" ).button( "destroy" );
+	assert.deepEqual( button.text(), "Label" );
+	assert.deepEqual( button.button( "option", "label" ), "Label" );
 } );
 
-test( "label, default", function() {
-	expect( 2 );
-	$( "#button" ).button();
-	deepEqual( $( "#button" ).text(), "Label" );
-	deepEqual( $( "#button" ).button( "option", "label" ), "Label" );
+QUnit.test( "label, with html markup", function( assert ) {
+	assert.expect( 3 );
+	var button = $( "#button2" ).button();
 
-	$( "#button" ).button( "destroy" );
+	assert.deepEqual( button.text(), "label with span" );
+	assert.deepEqual( button.html().toLowerCase(), "label <span>with span</span>" );
+	assert.deepEqual( button.button( "option", "label" ).toLowerCase(), "label <span>with span</span>" );
 } );
 
-test( "label", function() {
-	expect( 2 );
-	$( "#button" ).button( {
+QUnit.test( "label, explicit value", function( assert ) {
+	assert.expect( 2 );
+	var button = $( "#button" ).button( {
 		label: "xxx"
 	} );
-	deepEqual( $( "#button" ).text(), "xxx" );
-	deepEqual( $( "#button" ).button( "option", "label" ), "xxx" );
 
-	$( "#button" ).button( "destroy" );
+	assert.deepEqual( button.text(), "xxx" );
+	assert.deepEqual( button.button( "option", "label" ), "xxx" );
 } );
 
-test( "label default with input type submit", function() {
-	expect( 2 );
-	deepEqual( $( "#submit" ).button().val(), "Label" );
-	deepEqual( $( "#submit" ).button( "option", "label" ), "Label" );
+QUnit.test( "label, default, with input type submit", function( assert ) {
+	assert.expect( 2 );
+	var button = $( "#submit" ).button();
+
+	assert.deepEqual( button.val(), "Label" );
+	assert.deepEqual( button.button( "option", "label" ), "Label" );
 } );
 
-test( "label with input type submit", function() {
-	expect( 2 );
-	var label = $( "#submit" ).button( {
+QUnit.test( "label, explicit value, with input type submit", function( assert ) {
+	assert.expect( 2 );
+	var button = $( "#submit" ).button( {
 		label: "xxx"
-	} ).val();
-	deepEqual( label, "xxx" );
-	deepEqual( $( "#submit" ).button( "option", "label" ), "xxx" );
+	} );
+
+	assert.deepEqual( button.val(), "xxx" );
+	assert.deepEqual( button.button( "option", "label" ), "xxx" );
 } );
 
-test( "icons", function() {
-	expect( 1 );
-	$( "#button" ).button( {
-		text: false,
-		icons: {
-			primary: "iconclass",
-			secondary: "iconclass2"
-		}
-	} );
-	ok( $( "#button" ).is( ":has(span.ui-icon.ui-button-icon-primary.iconclass):has(span.ui-icon.ui-button-icon-secondary.iconclass2)" ) );
+QUnit.test( "icon", function( assert ) {
+	assert.expect( 4 );
+	var button = $( "#button" ).button( {
+			showLabel: false,
+			icon: "iconclass"
+		} ),
+		icon = button.find( ".ui-icon" );
 
-	$( "#button" ).button( "destroy" );
+	assert.hasClasses( icon, "iconclass" );
+	assert.equal( icon.length, 1, "button with icon option set has icon" );
+
+	button.button( "option", "icon", false );
+	assert.equal( button.find( ".ui-icon" ).length, 0, "setting icon to false removes the icon" );
+
+	button.button( "option", "icon", "iconclass" );
+	assert.ok( button.find( ".ui-icon" ).length, "setting icon to a value adds the icon" );
+
 } );
 
-test( "#5295 - button does not remove hoverstate if disabled", function( assert ) {
-	expect( 1 );
-	var btn = $( "#button" ).button();
-	btn.on( "hover", function() {
-		btn.button( "disable" );
-	} );
-	btn.trigger( "mouseenter" );
-	btn.trigger( "mouseleave" );
-	assert.lacksClasses( btn, "ui-state-hover" );
+QUnit.test( "icon position", function( assert ) {
+	assert.expect( 22 );
+
+	var button = $( "#button" ).button( {
+			icon: "ui-icon-gear"
+		} ),
+		icon = button.find( ".ui-icon" ),
+		space = button.find( ".ui-button-icon-space" );
+
+	assert.equal( icon.length, 1, "button with icon option set has icon" );
+	assert.equal( button.button( "option", "iconPosition" ), "beginning",
+		"Button has iconPosition beginning by default" );
+	assert.equal( button.contents()[ 0 ], icon[ 0 ], "icon is prepended when position is begining" );
+	assert.equal( icon.next()[ 0 ], space[ 0 ], "icon is followed by a space when position is begining" );
+	assert.equal( space.length, 1,
+		"ui-button-icon-space contains a breaking space iconPosition:beginning" );
+	assert.lacksClasses( icon, "ui-widget-icon-block" );
+
+	button.button( "option", "iconPosition", "end" );
+	icon = button.find( ".ui-icon" );
+	space = button.find( ".ui-button-icon-space" );
+	assert.equal( icon.length, 1, "Changing position to end does not re-create or duplicate icon" );
+	assert.equal( button.button( "option", "iconPosition" ), "end", "Button has iconPosition end" );
+	assert.equal( button.contents().last()[ 0 ], icon[ 0 ], "icon is appended when position is end" );
+	assert.equal( icon.prev()[ 0 ], space[ 0 ], "icon is preceeded by a space when position is end" );
+	assert.equal( space.length, 1,
+		"ui-button-icon-space contains a breaking space iconPosition:beginning" );
+	assert.lacksClasses( icon, "ui-widget-icon-block" );
+
+	button.button( "option", "iconPosition", "top" );
+	icon = button.find( ".ui-icon" );
+	assert.equal( icon.length, 1, "Changing position to top does not re-create or duplicate icon" );
+	assert.equal( button.button( "option", "iconPosition" ), "top", "Button has iconPosition top" );
+	assert.equal( button.contents()[ 0 ], icon[ 0 ], "icon is prepended when position is top" );
+	assert.ok( !button.find( "ui-button-icon-space" ).length,
+		"Button should not have an iconSpace with position: top" );
+	assert.hasClasses( icon, "ui-widget-icon-block" );
+
+	button.button( "option", "iconPosition", "bottom" );
+	icon = button.find( ".ui-icon" );
+	assert.equal( icon.length, 1, "Changing position to bottom does not re-create or duplicate icon" );
+	assert.equal( button.button( "option", "iconPosition" ), "bottom", "Button has iconPosition top" );
+	assert.equal( button.contents().last()[ 0 ], icon[ 0 ], "icon is prepended when position is bottom" );
+	assert.ok( !button.find( "ui-button-icon-space" ).length,
+		"Button should not have an iconSpace with position: bottom" );
+	assert.hasClasses( icon, "ui-widget-icon-block" );
+
 } );
 
 } );

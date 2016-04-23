@@ -24,6 +24,31 @@ var
 
 	allI18nFiles = expandFiles( "ui/i18n/*.js" ),
 
+	cssFiles = [
+		"core",
+		"accordion",
+		"autocomplete",
+		"button",
+		"checkboxradio",
+		"controlgroup",
+		"datepicker",
+		"dialog",
+		"draggable",
+		"menu",
+		"progressbar",
+		"resizable",
+		"selectable",
+		"selectmenu",
+		"sortable",
+		"slider",
+		"spinner",
+		"tabs",
+		"tooltip",
+		"theme"
+	].map(function( component ) {
+		return "themes/base/" + component + ".css";
+	}),
+
 	// minified files
 	minify = {
 		options: {
@@ -113,6 +138,18 @@ grunt.initConfig({
 		dist: "<%= pkg.name %>-<%= pkg.version %>"
 	},
 	compare_size: compareFiles,
+	concat: {
+		css: {
+			options: {
+				banner: createBanner( cssFiles ),
+				stripBanners: {
+					block: true
+				}
+			},
+			src: cssFiles,
+			dest: "dist/jquery-ui.css"
+		}
+	},
 	requirejs: {
 		js: {
 			options: {
@@ -126,7 +163,7 @@ grunt.initConfig({
 				findNestedDependencies: true,
 				skipModuleInsertion: true,
 				exclude: [ "jquery" ],
-				include: expandFiles( [ "ui/**/*.js", "!ui/i18n/*" ] ),
+				include: expandFiles( [ "ui/**/*.js", "!ui/core.js", "!ui/i18n/*" ] ),
 				out: "dist/jquery-ui.js",
 				wrap: {
 					start: createBanner( uiFiles ),
@@ -135,28 +172,33 @@ grunt.initConfig({
 		}
 	},
 
-	// Remove the requireSpacesInsideParentheses override once everything is fixed
 	jscs: {
-		all: {
+		ui: {
 			options: {
-				requireCapitalizedComments: null
+				config: true
 			},
 			files: {
-				src: [ "demos/**/*.js", "build/**/*.js", "tests/**/*.js", "ui/**/*.js" ]
+				src: [ "demos/**/*.js", "build/**/*.js", "ui/**/*.js" ]
+			}
+		},
+		tests: {
+			options: {
+				config: true,
+				maximumLineLength: null
+			},
+			files: {
+				src: [ "tests/**/*.js" ]
 			}
 		}
 	},
 	uglify: minify,
 	htmllint: {
-		good: [ "tests/**/*.html" ].concat( htmllintBad.map( function( file ) {
-			return "!" + file;
-		} ) ),
-		demos: {
+		good: {
 			options: {
 				ignore: [
 				/The text content of element “script” was not in the required format: Expected space, tab, newline, or slash but found “.” instead/
 			] },
-			src: [ "demos/**/*.html" ].concat( htmllintBad.map( function( file ) {
+			src: [ "demos/**/*.html", "tests/**/*.html" ].concat( htmllintBad.map( function( file ) {
 				return "!" + file;
 			} ) )
 		},
@@ -203,21 +245,6 @@ grunt.initConfig({
 				csslintrc: ".csslintrc"
 			}
 		}
-	},
-
-	esformatter: {
-		options: {
-			preset: "jquery"
-		},
-		ui: "ui/*.js",
-		tests: "tests/unit/**/*.js",
-		build: {
-			options: {
-				skipHashbang: true
-			},
-			src: "build/**/*.js"
-		},
-		grunt: "Gruntfile.js"
 	},
 
 	bowercopy: {
@@ -360,7 +387,7 @@ grunt.initConfig({
 });
 
 grunt.registerTask( "update-authors", function() {
-	var getAuthors = require( "grunt-git-authors" ),
+	var getAuthors = require( "grunt-git-authors" ).getAuthors,
 		done = this.async();
 
 	getAuthors({
@@ -372,7 +399,9 @@ grunt.registerTask( "update-authors", function() {
 		}
 
 		authors = authors.map(function( author ) {
-			if ( author.match( /^Jacek Jędrzejewski </ ) ) {
+			if ( author.match( /^Dan Strohl </ ) ) {
+				return "Dan Strohl";
+			} else if ( author.match( /^Jacek Jędrzejewski </ ) ) {
 				return "Jacek Jędrzejewski (http://jacek.jedrzejewski.name)";
 			} else if ( author.match( /^Pawel Maruszczyk </ ) ) {
 				return "Pawel Maruszczyk (http://hrabstwo.net)";
@@ -390,6 +419,7 @@ grunt.registerTask( "update-authors", function() {
 });
 
 grunt.registerTask( "default", [ "lint", "requirejs", "test" ]);
+grunt.registerTask( "jenkins", [ "default", "concat" ]);
 grunt.registerTask( "lint", [ "asciilint", "jshint", "jscs", "csslint", "htmllint" ]);
 grunt.registerTask( "test", [ "qunit" ]);
 grunt.registerTask( "sizer", [ "requirejs:js", "uglify:main", "compare_size:all" ]);

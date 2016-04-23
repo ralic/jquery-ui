@@ -7,7 +7,7 @@
  * http://jquery.org/license
  */
 
-//>>label: focusable
+//>>label: :focusable Selector
 //>>group: Core
 //>>description: Selects elements which can be focused.
 //>>docs: http://api.jqueryui.com/focusable-selector/
@@ -34,24 +34,26 @@ $.ui.focusable = function( element, hasTabindex ) {
 		if ( !element.href || !mapName || map.nodeName.toLowerCase() !== "map" ) {
 			return false;
 		}
-		img = $( "img[usemap='#" + mapName + "']" )[ 0 ];
-		return !!img && visible( img );
+		img = $( "img[usemap='#" + mapName + "']" );
+		return img.length > 0 && img.is( ":visible" );
 	}
 	return ( /^(input|select|textarea|button|object)$/.test( nodeName ) ?
 		!element.disabled :
 		"a" === nodeName ?
 			element.href || hasTabindex :
 			hasTabindex ) &&
-
-		// The element and all of its ancestors must be visible
-		visible( element );
+		$( element ).is( ":visible" ) && visible( $( element ) );
 };
 
+// Support: IE 8 only
+// IE 8 doesn't resolve inherit to visible/hidden for computed values
 function visible( element ) {
-	return $.expr.filters.visible( element ) &&
-		!$( element ).parents().addBack().filter( function() {
-			return $.css( this, "visibility" ) === "hidden";
-		} ).length;
+	var visibility = element.css( "visibility" );
+	while ( visibility === "inherit" ) {
+		element = element.parent();
+		visibility = element.css( "visibility" );
+	}
+	return visibility !== "hidden";
 }
 
 $.extend( $.expr[ ":" ], {

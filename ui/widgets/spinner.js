@@ -12,9 +12,9 @@
 //>>description: Displays buttons to easily input numbers via the keyboard or mouse.
 //>>docs: http://api.jqueryui.com/spinner/
 //>>demos: http://jqueryui.com/spinner/
-//>>css.structure: ../themes/base/core.css
-//>>css.structure: ../themes/base/spinner.css
-//>>css.theme: ../themes/base/theme.css
+//>>css.structure: ../../themes/base/core.css
+//>>css.structure: ../../themes/base/spinner.css
+//>>css.theme: ../../themes/base/theme.css
 
 ( function( factory ) {
 	if ( typeof define === "function" && define.amd ) {
@@ -35,7 +35,7 @@
 	}
 }( function( $ ) {
 
-function spinner_modifier( fn ) {
+function spinnerModifer( fn ) {
 	return function() {
 		var previous = this.element.val();
 		fn.apply( this, arguments );
@@ -75,6 +75,7 @@ $.widget( "ui.spinner", {
 	},
 
 	_create: function() {
+
 		// handle string values that need to be parsed
 		this._setOption( "max", this.options.max );
 		this._setOption( "min", this.options.min );
@@ -83,6 +84,7 @@ $.widget( "ui.spinner", {
 		// Only format if there is a value, prevents the field from being marked
 		// as invalid in Firefox, see #9573.
 		if ( this.value() !== "" ) {
+
 			// Format the value, but don't constrain.
 			this._value( this.element.val(), true );
 		}
@@ -102,8 +104,8 @@ $.widget( "ui.spinner", {
 	},
 
 	_getCreateOptions: function() {
-		var options = {},
-			element = this.element;
+		var options = this._super();
+		var element = this.element;
 
 		$.each( [ "min", "max", "step" ], function( i, option ) {
 			var value = element.attr( option );
@@ -169,6 +171,7 @@ $.widget( "ui.spinner", {
 				if ( !isActive ) {
 					this.element.trigger( "focus" );
 					this.previous = previous;
+
 					// support: IE
 					// IE sets focus asynchronously, so we need to check if focus
 					// moved off of the input because the user clicked on the button.
@@ -196,10 +199,12 @@ $.widget( "ui.spinner", {
 				return;
 			}
 
-			this._repeat( null, $( event.currentTarget ).hasClass( "ui-spinner-up" ) ? 1 : -1, event );
+			this._repeat( null, $( event.currentTarget )
+				.hasClass( "ui-spinner-up" ) ? 1 : -1, event );
 		},
 		"mouseup .ui-spinner-button": "_stop",
 		"mouseenter .ui-spinner-button": function( event ) {
+
 			// button will add ui-state-active if mouse was down while mouseleave and kept down
 			if ( !$( event.currentTarget ).hasClass( "ui-state-active" ) ) {
 				return;
@@ -208,8 +213,10 @@ $.widget( "ui.spinner", {
 			if ( this._start( event ) === false ) {
 				return false;
 			}
-			this._repeat( null, $( event.currentTarget ).hasClass( "ui-spinner-up" ) ? 1 : -1, event );
+			this._repeat( null, $( event.currentTarget )
+				.hasClass( "ui-spinner-up" ) ? 1 : -1, event );
 		},
+
 		// TODO: do we really want to consider this a stop?
 		// shouldn't we just stop the repeater and wait until mouseup before
 		// we trigger the stop event?
@@ -225,12 +232,7 @@ $.widget( "ui.spinner", {
 
 				// Add buttons
 				.append(
-					"<a>" +
-						"<span>&#9650;</span>" +
-					"</a>" +
-					"<a>" +
-						"<span>&#9660;</span>" +
-					"</a>"
+					"<a></a><a></a>"
 				);
 	},
 
@@ -245,28 +247,32 @@ $.widget( "ui.spinner", {
 		// Button bindings
 		this.buttons = this.uiSpinner.children( "a" )
 			.attr( "tabIndex", -1 )
-			.button();
+			.attr( "aria-hidden", true )
+			.button( {
+				classes: {
+					"ui-button": ""
+				}
+			} );
 
 		// TODO: Right now button does not support classes this is already updated in button PR
 		this._removeClass( this.buttons, "ui-corner-all" );
 
 		this._addClass( this.buttons.first(), "ui-spinner-button ui-spinner-up" );
 		this._addClass( this.buttons.last(), "ui-spinner-button ui-spinner-down" );
-		this._addClass( this.buttons.first().find( ".ui-button-text span" ), null,
-			"ui-icon " + this.options.icons.up );
-		this._addClass( this.buttons.last().find( ".ui-button-text span" ), null,
-			"ui-icon " + this.options.icons.down );
+		this.buttons.first().button( {
+			"icon": this.options.icons.up,
+			"showLabel": false
+		} );
+		this.buttons.last().button( {
+			"icon": this.options.icons.down,
+			"showLabel": false
+		} );
 
 		// IE 6 doesn't understand height: 50% for the buttons
 		// unless the wrapper has an explicit height
 		if ( this.buttons.height() > Math.ceil( this.uiSpinner.height() * 0.5 ) &&
 				this.uiSpinner.height() > 0 ) {
 			this.uiSpinner.height( this.uiSpinner.height() );
-		}
-
-		// Disable spinner if element was already disabled
-		if ( this.options.disabled ) {
-			this.disable();
 		}
 	},
 
@@ -364,8 +370,10 @@ $.widget( "ui.spinner", {
 		// - find out where we are relative to the base (min or 0)
 		base = options.min !== null ? options.min : 0;
 		aboveMin = value - base;
+
 		// - round to the nearest step
 		aboveMin = Math.round( aboveMin / options.step ) * options.step;
+
 		// - rounding is based on 0, so adjust back to our base
 		value = base + aboveMin;
 
@@ -420,15 +428,17 @@ $.widget( "ui.spinner", {
 		}
 
 		this._super( key, value );
-
-		if ( key === "disabled" ) {
-			this._toggleClass( this.uiSpinner, null, "ui-state-disabled", !!value );
-			this.element.prop( "disabled", !!value );
-			this.buttons.button( value ? "disable" : "enable" );
-		}
 	},
 
-	_setOptions: spinner_modifier( function( options ) {
+	_setOptionDisabled: function( value ) {
+		this._super( value );
+
+		this._toggleClass( this.uiSpinner, null, "ui-state-disabled", !!value );
+		this.element.prop( "disabled", !!value );
+		this.buttons.button( value ? "disable" : "enable" );
+	},
+
+	_setOptions: spinnerModifer( function( options ) {
 		this._super( options );
 	} ),
 
@@ -453,6 +463,7 @@ $.widget( "ui.spinner", {
 		this.element.attr( {
 			"aria-valuemin": this.options.min,
 			"aria-valuemax": this.options.max,
+
 			// TODO: what should we do with values that can't be parsed?
 			"aria-valuenow": this._parse( this.element.val() )
 		} );
@@ -494,7 +505,7 @@ $.widget( "ui.spinner", {
 		this.uiSpinner.replaceWith( this.element );
 	},
 
-	stepUp: spinner_modifier( function( steps ) {
+	stepUp: spinnerModifer( function( steps ) {
 		this._stepUp( steps );
 	} ),
 	_stepUp: function( steps ) {
@@ -504,7 +515,7 @@ $.widget( "ui.spinner", {
 		}
 	},
 
-	stepDown: spinner_modifier( function( steps ) {
+	stepDown: spinnerModifer( function( steps ) {
 		this._stepDown( steps );
 	} ),
 	_stepDown: function( steps ) {
@@ -514,11 +525,11 @@ $.widget( "ui.spinner", {
 		}
 	},
 
-	pageUp: spinner_modifier( function( pages ) {
+	pageUp: spinnerModifer( function( pages ) {
 		this._stepUp( ( pages || 1 ) * this.options.page );
 	} ),
 
-	pageDown: spinner_modifier( function( pages ) {
+	pageDown: spinnerModifer( function( pages ) {
 		this._stepDown( ( pages || 1 ) * this.options.page );
 	} ),
 
@@ -526,7 +537,7 @@ $.widget( "ui.spinner", {
 		if ( !arguments.length ) {
 			return this._parse( this.element.val() );
 		}
-		spinner_modifier( this._value ).call( this, newVal );
+		spinnerModifer( this._value ).call( this, newVal );
 	},
 
 	widget: function() {
@@ -554,13 +565,7 @@ if ( $.uiBackCompat !== false ) {
 		},
 
 		_buttonHtml: function() {
-			return "" +
-				"<a>" +
-					"<span>&#9650;</span>" +
-				"</a>" +
-				"<a>" +
-					"<span>&#9660;</span>" +
-				"</a>";
+			return "<a></a><a></a>";
 		}
 	} );
 }

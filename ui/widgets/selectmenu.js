@@ -9,12 +9,14 @@
 
 //>>label: Selectmenu
 //>>group: Widgets
+// jscs:disable maximumLineLength
 //>>description: Duplicates and extends the functionality of a native HTML select element, allowing it to be customizable in behavior and appearance far beyond the limitations of a native select.
+// jscs:enable maximumLineLength
 //>>docs: http://api.jqueryui.com/selectmenu/
 //>>demos: http://jqueryui.com/selectmenu/
-//>>css.structure: ../themes/base/core.css
-//>>css.structure: ../themes/base/selectmenu.css
-//>>css.theme: ../themes/base/theme.css
+//>>css.structure: ../../themes/base/core.css
+//>>css.structure: ../../themes/base/selectmenu.css, ../../themes/base/button.css
+//>>css.theme: ../../themes/base/theme.css
 
 ( function( factory ) {
 	if ( typeof define === "function" && define.amd ) {
@@ -24,6 +26,7 @@
 			"jquery",
 			"./menu",
 			"../escape-selector",
+			"../form-reset-mixin",
 			"../keycode",
 			"../labels",
 			"../position",
@@ -38,7 +41,7 @@
 	}
 }( function( $ ) {
 
-return $.widget( "ui.selectmenu", {
+return $.widget( "ui.selectmenu", [ $.ui.formResetMixin, {
 	version: "@VERSION",
 	defaultElement: "<select>",
 	options: {
@@ -76,13 +79,10 @@ return $.widget( "ui.selectmenu", {
 
 		this._drawButton();
 		this._drawMenu();
+		this._bindFormResetHandler();
 
 		this._rendered = false;
 		this.menuItems = $();
-
-		if ( this.options.disabled ) {
-			this.disable();
-		}
 	},
 
 	_drawButton: function() {
@@ -119,11 +119,10 @@ return $.widget( "ui.selectmenu", {
 			.insertAfter( this.element );
 
 		this._addClass( this.button, "ui-selectmenu-button ui-selectmenu-button-closed",
-			"ui-widget ui-state-default" );
+			"ui-button ui-widget" );
 
-		icon = $( "<span>" ).prependTo( this.button );
-		this._addClass( icon, null, "ui-icon " + this.options.icons.button );
-
+		icon = $( "<span>" ).appendTo( this.button );
+		this._addClass( icon, "ui-selectmenu-icon", "ui-icon " + this.options.icons.button );
 		this.buttonItem = this._renderButtonItem( item )
 			.appendTo( this.button );
 
@@ -140,8 +139,6 @@ return $.widget( "ui.selectmenu", {
 				that._refreshMenu();
 			}
 		} );
-		this._hoverable( this.button );
-		this._focusable( this.button );
 	},
 
 	_drawMenu: function() {
@@ -562,22 +559,24 @@ return $.widget( "ui.selectmenu", {
 			this.menuWrap.appendTo( this._appendTo() );
 		}
 
-		if ( key === "disabled" ) {
-			this.menuInstance.option( "disabled", value );
-			this.button.attr( "aria-disabled", value );
-			this._toggleClass( this.button, null, "ui-state-disabled", value );
-
-			this.element.prop( "disabled", value );
-			if ( value ) {
-				this.button.attr( "tabindex", -1 );
-				this.close();
-			} else {
-				this.button.attr( "tabindex", 0 );
-			}
-		}
-
 		if ( key === "width" ) {
 			this._resizeButton();
+		}
+	},
+
+	_setOptionDisabled: function( value ) {
+		this._super( value );
+
+		this.menuInstance.option( "disabled", value );
+		this.button.attr( "aria-disabled", value );
+		this._toggleClass( this.button, null, "ui-state-disabled", value );
+
+		this.element.prop( "disabled", value );
+		if ( value ) {
+			this.button.attr( "tabindex", -1 );
+			this.close();
+		} else {
+			this.button.attr( "tabindex", 0 );
 		}
 	},
 
@@ -608,7 +607,7 @@ return $.widget( "ui.selectmenu", {
 		// we always remove classes first and add them second, otherwise if both classes have the
 		// same theme class, it will be removed after we add it.
 		this._removeClass( this.button, "ui-selectmenu-button-" +
-				( this.isOpen ? "closed" : "open" ) )
+			( this.isOpen ? "closed" : "open" ) )
 			._addClass( this.button, "ui-selectmenu-button-" +
 				( this.isOpen ? "open" : "closed" ) )
 			._toggleClass( this.menuWrap, "ui-selectmenu-open", null, this.isOpen );
@@ -646,7 +645,11 @@ return $.widget( "ui.selectmenu", {
 	},
 
 	_getCreateOptions: function() {
-		return { disabled: this.element.prop( "disabled" ) };
+		var options = this._super();
+
+		options.disabled = this.element.prop( "disabled" );
+
+		return options;
 	},
 
 	_parseOptions: function( options ) {
@@ -672,12 +675,13 @@ return $.widget( "ui.selectmenu", {
 	},
 
 	_destroy: function() {
+		this._unbindFormResetHandler();
 		this.menuWrap.remove();
 		this.button.remove();
 		this.element.show();
 		this.element.removeUniqueId();
 		this.labels.attr( "for", this.ids.element );
 	}
-} );
+} ] );
 
 } ) );

@@ -1,119 +1,120 @@
 define( [
+	"qunit",
 	"jquery",
 	"./helper",
 	"ui/widgets/sortable"
-], function( $, testHelper ) {
+], function( QUnit, $, testHelper ) {
 
-module("sortable: methods");
+QUnit.module( "sortable: methods" );
 
-test("init", function() {
-	expect(5);
+QUnit.test( "init", function( assert ) {
+	assert.expect( 5 );
 
-	$("<div></div>").appendTo("body").sortable().remove();
-	ok(true, ".sortable() called on element");
+	$( "<div></div>" ).appendTo( "body" ).sortable().remove();
+	assert.ok( true, ".sortable() called on element" );
 
-	$([]).sortable();
-	ok(true, ".sortable() called on empty collection");
+	$( [] ).sortable();
+	assert.ok( true, ".sortable() called on empty collection" );
 
-	$("<div></div>").sortable();
-	ok(true, ".sortable() called on disconnected DOMElement");
+	$( "<div></div>" ).sortable();
+	assert.ok( true, ".sortable() called on disconnected DOMElement" );
 
-	$("<div></div>").sortable().sortable("option", "foo");
-	ok(true, "arbitrary option getter after init");
+	$( "<div></div>" ).sortable().sortable( "option", "foo" );
+	assert.ok( true, "arbitrary option getter after init" );
 
-	$("<div></div>").sortable().sortable("option", "foo", "bar");
-	ok(true, "arbitrary option setter after init");
-});
+	$( "<div></div>" ).sortable().sortable( "option", "foo", "bar" );
+	assert.ok( true, "arbitrary option setter after init" );
+} );
 
-test("destroy", function() {
-	expect(4);
-	$("<div></div>").appendTo("body").sortable().sortable("destroy").remove();
-	ok(true, ".sortable('destroy') called on element");
+QUnit.test( "destroy", function( assert ) {
+	assert.expect( 4 );
+	$( "<div></div>" ).appendTo( "body" ).sortable().sortable( "destroy" ).remove();
+	assert.ok( true, ".sortable('destroy') called on element" );
 
-	$([]).sortable().sortable("destroy");
-	ok(true, ".sortable('destroy') called on empty collection");
+	$( [] ).sortable().sortable( "destroy" );
+	assert.ok( true, ".sortable('destroy') called on empty collection" );
 
-	$("<div></div>").sortable().sortable("destroy");
-	ok(true, ".sortable('destroy') called on disconnected DOMElement");
+	$( "<div></div>" ).sortable().sortable( "destroy" );
+	assert.ok( true, ".sortable('destroy') called on disconnected DOMElement" );
 
-	var expected = $("<div></div>").sortable(),
-		actual = expected.sortable("destroy");
-	equal(actual, expected, "destroy is chainable");
-});
+	var expected = $( "<div></div>" ).sortable(),
+		actual = expected.sortable( "destroy" );
+	assert.equal( actual, expected, "destroy is chainable" );
+} );
 
-test("enable", function() {
-	expect(5);
+QUnit.test( "enable", function( assert ) {
+	assert.expect( 5 );
 
 	var el, actual, expected;
 
-	el = $("#sortable").sortable({ disabled: true });
+	el = $( "#sortable" ).sortable( { disabled: true } );
 
-	testHelper.sort($("li", el)[0], 0, 44, 0, ".sortable({ disabled: true })");
+	testHelper.sort( assert, $( "li", el )[ 0 ], 0, 44, 0, ".sortable({ disabled: true })" );
 
-	el.sortable("enable");
-	equal(el.sortable("option", "disabled"), false, "disabled option getter");
+	el.sortable( "enable" );
+	assert.equal( el.sortable( "option", "disabled" ), false, "disabled option getter" );
 
-	el.sortable("destroy");
-	el.sortable({ disabled: true });
-	el.sortable("option", "disabled", false);
-	equal(el.sortable("option", "disabled"), false, "disabled option setter");
+	el.sortable( "destroy" );
+	el.sortable( { disabled: true } );
+	el.sortable( "option", "disabled", false );
+	assert.equal( el.sortable( "option", "disabled" ), false, "disabled option setter" );
 
-	testHelper.sort($("li", el)[0], 0, 44, 2, ".sortable('option', 'disabled', false)");
+	testHelper.sort( assert, $( "li", el )[ 0 ], 0, 44, 2, ".sortable('option', 'disabled', false)" );
 
-	expected = $("<div></div>").sortable(),
-	actual = expected.sortable("enable");
-	equal(actual, expected, "enable is chainable");
-});
+	expected = $( "<div></div>" ).sortable(),
+	actual = expected.sortable( "enable" );
+	assert.equal( actual, expected, "enable is chainable" );
+} );
 
-test( "disable", function( assert ) {
-	expect( 9 );
+QUnit.test( "disable", function( assert ) {
+	assert.expect( 9 );
 
 	var chainable,
-		element = $( "#sortable" ).sortable({ disabled: false });
+		element = $( "#sortable" ).sortable( { disabled: false } );
 
-	testHelper.sort( $( "li", element )[ 0 ], 0, 44, 2, ".sortable({ disabled: false })" );
+	testHelper.sort( assert, $( "li", element )[ 0 ], 0, 44, 2, ".sortable({ disabled: false })" );
 
 	chainable = element.sortable( "disable" );
-	testHelper.sort( $( "li", element )[ 0 ], 0, 44, 0, "disabled.sortable getter" );
+	testHelper.sort( assert, $( "li", element )[ 0 ], 0, 44, 0, "disabled.sortable getter" );
 
 	element.sortable( "destroy" );
 
-	element.sortable({ disabled: false });
-	testHelper.sort( $( "li", element )[ 0 ], 0, 44, 2, ".sortable({ disabled: false })" );
-	element.sortable( "option", "disabled", true);
-	equal( element.sortable( "option", "disabled" ), true, "disabled option setter" );
+	element.sortable( { disabled: false } );
+	testHelper.sort( assert, $( "li", element )[ 0 ], 0, 44, 2, ".sortable({ disabled: false })" );
+	element.sortable( "option", "disabled", true );
+	assert.equal( element.sortable( "option", "disabled" ), true, "disabled option setter" );
 
 	assert.lacksClasses( element.sortable( "widget" ), "ui-state-disabled" );
-	ok( !element.sortable( "widget" ).attr( "aria-disabled" ), "element does not get aria-disabled" );
+	assert.ok( !element.sortable( "widget" ).attr( "aria-disabled" ), "element does not get aria-disabled" );
 	assert.hasClasses( element.sortable( "widget" ), "ui-sortable-disabled" );
 
-	testHelper.sort($( "li", element )[ 0 ], 0, 44, 0, ".sortable('option', 'disabled', true)" );
-	equal( chainable, element, "disable is chainable" );
-});
+	testHelper.sort( assert, $( "li", element )[ 0 ], 0, 44, 0, ".sortable('option', 'disabled', true)" );
+	assert.equal( chainable, element, "disable is chainable" );
+} );
 
-test( "refresh() should update the positions of initially empty lists (see #7498)", function() {
-	expect( 1 );
+QUnit.test( "refresh() should update the positions of initially empty lists (see #7498)", function( assert ) {
+	assert.expect( 1 );
 
 	var changeCount = 0,
 		element = $( "#qunit-fixture" ).html( "<ul></ul>" ).find( "ul" );
 
 	element
-		.css({
+		.css( {
 			"float": "left",
 			width: "100px"
-		})
-		.sortable({
+		} )
+		.sortable( {
 			change: function() {
 				changeCount++;
 			}
-		})
+		} )
 		.append( "<li>a</li><li>a</li>" )
 		.find( "li" )
-			.css({
+			.css( {
 				"float": "left",
 				width: "50px",
 				height: "50px"
-			});
+			} );
 
 	element.sortable( "refresh" );
 
@@ -121,9 +122,9 @@ test( "refresh() should update the positions of initially empty lists (see #7498
 	element.find( "li" ).eq( 0 ).simulate( "drag", {
 		dx: 55,
 		moves: 15
-	});
+	} );
 
-	equal( changeCount, 1 );
-});
+	assert.equal( changeCount, 1 );
+} );
 
 } );

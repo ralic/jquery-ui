@@ -255,7 +255,7 @@ Gan Eng Chin <engchin.gan@gmail.com>
 Gabriel Schulhof <gabriel.schulhof@intel.com>
 Alexander Schmitz <arschmitz@gmail.com>
 Vilhjálmur Skúlason <vis@dmm.is>
-Siebrand Mazeland <s.mazeland@xs4all.nl>
+Siebrand Mazeland <siebrand@kitano.nl>
 Mohsen Ekhtiari <mohsenekhtiari@yahoo.com>
 Pere Orga <gotrunks@gmail.com>
 Jasper de Groot <mail@ugomobi.com>
@@ -289,3 +289,40 @@ Simen Bekkhus <sbekkhus91@gmail.com>
 Chen Eshchar <eshcharc@gmail.com>
 Bruno Pérel <brunoperel@gmail.com>
 Mohammed Alshehri <m@dralshehri.com>
+Lisa Seacat DeLuca <ldeluca@us.ibm.com>
+Anne-Gaelle Colom <coloma@westminster.ac.uk>
+Adam Foster <slimfoster@gmail.com>
+Luke Page <luke.a.page@gmail.com>
+Daniel Owens <daniel@matchstickmixup.com>
+Michael Orchard <morchard@scottlogic.co.uk>
+Marcus Warren <marcus@envoke.com>
+Nils Heuermann <nils@world-of-scripts.de>
+Marco Ziech <marco@ziech.net>
+Patricia Juarez <patrixd@gmail.com>
+Ben Mosher <me@benmosher.com>
+Ablay Keldibek <atomio.ak@gmail.com>
+Thomas Applencourt <thomas.applencourt@irsamc.ups-tlse.fr>
+Jiabao Wu <jiabao.foss@gmail.com>
+Eric Lee Carraway <github@ericcarraway.com>
+Victor Homyakov <vkhomyackov@gmail.com>
+Myeongjin Lee <aranet100@gmail.com>
+Liran Sharir <lsharir@gmail.com>
+Weston Ruter <weston@xwp.co>
+Mani Mishra <manimishra902@gmail.com>
+Hannah Methvin <hannahmethvin@gmail.com>
+Leonardo Balter <leonardo.balter@gmail.com>
+Benjamin Albert <benjamin_a5@yahoo.com>
+Michał Gołębiowski <m.goleb@gmail.com>
+Alyosha Pushak <alyosha.pushak@gmail.com>
+Fahad Ahmad <fahadahmad41@hotmail.com>
+Matt Brundage <github@mattbrundage.com>
+Francesc Baeta <francesc.baeta@gmail.com>
+Piotr Baran <piotros@wp.pl>
+Mukul Hase <mukulhase@gmail.com>
+Konstantin Dinev <kdinev@mail.bw.edu>
+Rand Scullard <rand@randscullard.com>
+Dan Strohl
+Maksim Ryzhikov <rv.maksim@gmail.com>
+Amine HADDAD <haddad@allegorie.tv>
+Amanpreet Singh <apsdehal@gmail.com>
+Alexey Balchunas <bleshik@gmail.com>

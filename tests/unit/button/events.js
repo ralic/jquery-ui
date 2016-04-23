@@ -1,36 +1,23 @@
 define( [
+	"qunit",
 	"jquery",
 	"ui/widgets/button"
-], function( $ ) {
+], function( QUnit, $ ) {
 
-module( "button: events" );
+QUnit.module( "Button: events" );
 
-test( "buttonset works with single-quote named elements (#7505)", function() {
-	expect( 1 );
-	$( "#radio3" ).buttonset();
-	$( "#radio33" ).on( "click", function() {
-		ok( true, "button clicks work with single-quote named elements" );
-	} ).trigger( "click" );
-} );
+QUnit.test( "Anchor recieves click event when spacebar is pressed", function( assert ) {
+	var ready = assert.async();
+	assert.expect( 1 );
+	var element = $( "#anchor-button" ).button();
 
-asyncTest( "when button loses focus, ensure active state is removed (#8559)", function( assert ) {
-	expect( 1 );
-
-	var element = $( "#button" ).button();
-
-	element.one( "keypress", function() {
-		element.one( "blur", function() {
-			assert.lacksClasses( element, "ui-state-active", "button loses active state appropriately" );
-			start();
-		} ).trigger( "blur" );
+	element.on( "click", function( event ) {
+		event.preventDefault();
+		assert.ok( true, "click occcured as a result of spacebar" );
+		ready();
 	} );
 
-	element.trigger( "focus" );
-	setTimeout( function() {
-		element
-			.simulate( "keydown", { keyCode: $.ui.keyCode.ENTER } )
-			.simulate( "keypress", { keyCode: $.ui.keyCode.ENTER } );
-	} );
+	element.trigger( $.Event( "keyup", { keyCode: $.ui.keyCode.SPACE } ) );
 } );
 
 } );
